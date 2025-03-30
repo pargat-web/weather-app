@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weather Tracker Application</title>
+    <!------------- External libraries and stylesheets ------------->
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/weather-icons/2.0.10/css/weather-icons.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="styles.css">
+    <!-- Fallback style for local file opening without server -->
+    <style>
+        /* Fallback background pattern for cards when opened directly */
+        .current-weather::before {
+            background-image: linear-gradient(rgba(255, 255, 255, 0.05) 1px,
+                    transparent 1px),
+                linear-gradient(90deg,
+                    rgba(255, 255, 255, 0.05) 1px,
+                    transparent 1px);
+            background-size: 20px 20px;
+            background-position: center center;
+        }
+    </style>
+</head>
+
+<body>
+    <!------------- Background elements ------------->
+    <div class="weather-bg">
+        <div class="clouds"></div>
+        <div class="stars"></div>
+        <div class="weather-animation-container">
+            <div class="rain-container"></div>
+            <div class="snow-container"></div>
+            <div class="fog-container"></div>
+            <div class="thunder-container"></div>
+            <div class="sun-rays"></div>
+        </div>
+    </div>
+
+    <!------------- Main application container ------------->
+    <div class="app-container">
+        <!------------- Left side: Main weather content ------------->
+        <main class="main-content">
+            <div class="container">
+                <!------------- App header with logo ------------->
+                <header>
+                    <div class="logo">
+                        <i class="wi wi-day-sunny"></i>
+                        <h1>Weather Tracker</h1>
+                    </div>
+                    <button id="settingsButton" class="settings-button" title="Customize Appearance">
+                        <i class="fas fa-palette"></i>
+                    </button>
+                </header>
+
+                <!------------- Search box section ------------->
+                <div class="search-section">
+                    <div class="input-group">
+                        <input type="text" id="cityInput" placeholder="Enter city name">
+                        <button id="searchButton">
+                            <i class="wi wi-direction-up"></i> Search
+                        </button>
+                    </div>
+                    <div id="inputError" class="error-message"></div>
+                </div>
+
+                <!------------- Loading spinner ------------->
+                <div class="loader" id="loader">
+                    <div class="spinner"></div>
+                </div>
+
+                <!------------- Weather data section ------------->
+                <div id="weatherData" class="weather-data">
+                    <!------------- Current weather information ------------->
+                    <div class="current-weather">
+                        <!------------- City name and favorites button ------------->
+                        <div class="weather-header">
+                            <h2 id="cityName"></h2>
+                            <button id="addToFavorites" class="favorite-button">
+                                <i class="wi wi-stars"></i>
+                                <i class="fas fa-heart heart-icon"></i>
+                                <span>Add to Favorites</span>
+                            </button>
+                        </div>
+                        <!------------- Main weather details ------------->
+                        <div class="weather-info">
+                            <div class="weather-icon">
+                                <img id="weatherIcon" src="" alt="Weather Icon">
+                            </div>
+                            <div class="weather-details">
+                                <div class="weather-details-grid">
+                                    <div class="main-temp">
+                                        <p id="temperature" class="temp"><i class="wi wi-thermometer"></i> <span></span>
+                                        </p>
+                                        <p id="feelsLike"><i class="wi wi-thermometer-exterior"></i> Feels like:
+                                            <span></span></p>
+                                    </div>
+                                    <div class="weather-metrics">
+                                        <p id="weatherDescription"><i class="wi wi-cloud"></i> <span></span></p>
+                                        <p id="humidity"><i class="wi wi-humidity"></i> <span></span></p>
+                                        <p id="windSpeed"><i class="wi wi-strong-wind"></i> <span></span></p>
+                                        <p id="pressure"><i class="wi wi-barometer"></i> Pressure: <span></span></p>
+                                        <p id="visibility"><i class="wi wi-dust"></i> Visibility: <span></span></p>
+                                    </div>
+                                    <div class="sun-times">
+                                        <p id="sunrise"><i class="wi wi-sunrise"></i> Sunrise: <span></span></p>
+                                        <p id="sunset"><i class="wi wi-sunset"></i> Sunset: <span></span></p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!------------- Additional weather information ------------->
+                        <div class="additional-weather-data">
+                            <h4>Additional Information</h4>
+                            <div class="data-grid">
+                                <div class="data-item">
+                                    <p id="tempMin"><i class="wi wi-thermometer-exterior"></i> Min Temp: <span></span>
+                                    </p>
+                                </div>
+                                <div class="data-item">
+                                    <p id="tempMax"><i class="wi wi-thermometer"></i> Max Temp: <span></span></p>
+                                </div>
+                                <div class="data-item">
+                                    <p id="windDirection"><i class="wi wi-wind-direction"></i> Wind Direction:
+                                        <span></span></p>
+                                </div>
+                                <div class="data-item">
+                                    <p id="windGust"><i class="wi wi-strong-wind"></i> Wind Gust: <span></span></p>
+                                </div>
+                                <div class="data-item">
+                                    <p id="clouds"><i class="wi wi-cloudy"></i> Cloudiness: <span></span></p>
+                                </div>
+                                <div class="data-item">
+                                    <p id="coordinates"><i class="wi wi-direction-up"></i> Coordinates: <span></span>
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!------------- 5-Day weather forecast section ------------->
+                    <div class="forecast-section">
+                        <h3><i class="wi wi-time-1"></i> 5-Day Forecast</h3>
+                        <div id="forecast" class="forecast-container"></div>
+                    </div>
+                </div>
+
+                <!------------- API error messages ------------->
+                <div id="apiError" class="error-message api-error"></div>
+            </div>
+        </main>
+
+        <!------------- Right side: Favorites sidebar ------------->
+        <aside class="favorites-sidebar">
+            <div class="favorites-section">
+                <h3><i class="wi wi-stars"></i> Favorite Cities</h3>
+                <div id="favoritesList" class="favorites-list"></div>
+            </div>
+        </aside>
+    </div>
+
+    <!-- CSS Variables Customization Dialog -->
+    <div id="customizeDialog" class="customize-dialog">
+        <div class="customize-dialog-content">
+            <div class="dialog-header">
+                <h3><i class="fas fa-palette"></i> Customize Appearance</h3>
+                <button id="closeDialog" class="close-button"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="dialog-body">
+                <div class="customize-section">
+                    <h4>Colors</h4>
+                    <div class="customize-option">
+                        <label for="primaryColor">Primary Color:</label>
+                        <input type="color" id="primaryColor" value="#1e88e5">
+                    </div>
+                    <div class="customize-option">
+                        <label for="accentColor">Accent Color:</label>
+                        <input type="color" id="accentColor" value="#ff9800">
+                    </div>
+                    <div class="customize-option">
+                        <label for="backgroundColor">Background Color:</label>
+                        <input type="color" id="backgroundColor" value="#0a1929">
+                    </div>
+                </div>
+                <div class="customize-section">
+                    <h4>Typography</h4>
+                    <div class="customize-option">
+                        <label for="fontSize">Font Size:</label>
+                        <input type="range" id="fontSize" min="12" max="20" value="16">
+                        <span id="fontSizeValue">16px</span>
+                    </div>
+                </div>
+                <div class="customize-section">
+                    <h4>Layout</h4>
+                    <div class="customize-option">
+                        <label for="borderRadius">Border Radius:</label>
+                        <input type="range" id="borderRadius" min="0" max="20" value="12">
+                        <span id="borderRadiusValue">12px</span>
+                    </div>
+                </div>
+            </div>
+            <div class="dialog-footer">
+                <button id="resetDefaults" class="reset-button">Reset to Defaults</button>
+            </div>
+        </div>
+    </div>
+
+    <script type="module" src="script.js"></script>
+</body>
+
+</html>
